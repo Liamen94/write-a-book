@@ -4,7 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cebe2b76-7ee6-4b9f-a98d-7cd6bbe79775" name="Changes" comment="Added basic style, context menu and basic validation." />
+    <list default="true" id="cebe2b76-7ee6-4b9f-a98d-7cd6bbe79775" name="Changes" comment="Added basic style, validation and context menu">
+      <change afterPath="$PROJECT_DIR$/src/main/resources/images/icons/dir.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/images/icons/empty_dir.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/images/icons/favicon.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/images/icons/file.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/liamen/texteditor/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/liamen/texteditor/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/liamen/texteditor/controller/EditorController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/liamen/texteditor/controller/EditorController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/liamen/texteditor/view/StyledTreeCell.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/liamen/texteditor/view/StyledTreeCell.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/css/style.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/liamen/texteditor/view/StyledTreeCell.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/liamen/texteditor/view/StyledTreeCell.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/css/style.css" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -64,6 +76,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "master",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "D:/ProgrammingProjects/Java/WriteABook/pom.xml",
@@ -75,6 +88,8 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\ProgrammingProjects\Java\WriteABook\src\main\resources\images\icons" />
+      <recent name="D:\ProgrammingProjects\Java\WriteABook\src\main\resources\images" />
       <recent name="D:\ProgrammingProjects\Java\WriteABook\src\main\java\com\liamen\texteditor" />
       <recent name="D:\ProgrammingProjects\Java\WriteABook" />
     </key>
@@ -132,7 +147,15 @@
       <option name="project" value="LOCAL" />
       <updated>1739117628759</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Added basic style, validation and context menu">
+      <option name="closed" value="true" />
+      <created>1739119570861</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1739119570861</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -150,6 +173,7 @@
     <MESSAGE value="Project started" />
     <MESSAGE value="Project structure and first area implementation" />
     <MESSAGE value="Added basic style, context menu and basic validation." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added basic style, context menu and basic validation." />
+    <MESSAGE value="Added basic style, validation and context menu" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added basic style, validation and context menu" />
   </component>
 </project>

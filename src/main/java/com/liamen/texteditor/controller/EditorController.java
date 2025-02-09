@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.image.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 
@@ -24,6 +25,18 @@ public class EditorController {
     @FXML
     private TreeView<String> projectTreeView;
 
+    private final Image directoryIconEmpty;
+    private final Image directoryIconFull;
+    private final Image file;
+
+    public EditorController() {
+        directoryIconEmpty = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/icons/empty_dir.png")));
+        directoryIconFull = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/icons/dir.png")));
+        file = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/icons/file.png")));
+    }
+
+
+
     @FXML
     public void initialize() {
 
@@ -36,7 +49,12 @@ public class EditorController {
             e.printStackTrace();
             System.out.println("Error loading infoPane.fxml");
         }
-
+        if(directoryIconEmpty.isError()){
+            System.out.println("Error loading empty_dir.png");
+        }
+        if(directoryIconFull.isError()){
+            System.out.println(("Error loading dir.png"));
+        }
         //load stylesheet
         mainPane.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/css/style.css")).toExternalForm());
         // Initialize root
@@ -47,6 +65,7 @@ public class EditorController {
         FileTreeItem item1 = new FileTreeItem("File1.txt", false);
         FileTreeItem item2 = new FileTreeItem("File2.txt", false);
         FileTreeItem dir1 = new FileTreeItem("Directory1", true);
+        setIcon(dir1);
 
         rootItem.getChildren().addAll(item1, item2, dir1);
 
@@ -55,7 +74,7 @@ public class EditorController {
         projectTreeView.setShowRoot(true);
 
         projectTreeView.setCellFactory(treeView -> {
-            TreeCell<String> cell = new StyledTreeCell();
+            TreeCell<String> cell = new StyledTreeCell(directoryIconEmpty, directoryIconFull, file);
             ContextMenu contextMenu = new ContextMenu();
             Menu newMenu = new Menu("New");
             MenuItem newFileItem = new MenuItem("New File");
@@ -73,7 +92,7 @@ public class EditorController {
             return cell;
         });
 
-        // Add listener to the tree view in order to disable directory text area
+        // Add listener to the tree view in order to disable item text area
         projectTreeView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 FileTreeItem selectedItem = (FileTreeItem) newValue;
@@ -84,6 +103,18 @@ public class EditorController {
                 }
             }
         });
+    }
+
+    private void setIcon(FileTreeItem item) {
+        if(item.isDirectory()){
+            if (item.getChildren().isEmpty()) {
+                item.setGraphic(new ImageView(directoryIconEmpty));
+            } else {
+                item.setGraphic(new ImageView(directoryIconFull));
+            }
+        } else {
+            item.setGraphic(new ImageView((file)));
+        }
     }
 
     // Methods to add child in the tree view
@@ -110,8 +141,14 @@ public class EditorController {
                         alert.show();
                     } else {
                         FileTreeItem newItem = new FileTreeItem(itemName, isDirectory);
+                        if (isDirectory) {
+                            setIcon(newItem);
+                        }
                         parent.getChildren().add(newItem);
                         parent.setExpanded(true);
+                        if (parent instanceof FileTreeItem){
+                            setIcon((FileTreeItem) parent);
+                        }
                     }
                 }
             }
