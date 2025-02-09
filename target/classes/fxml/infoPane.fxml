@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<VBox>
+    <Label text="Directory Information"/>
+    <TextField promptText="Enter directory details here"/>
+</VBox>
