@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.liamen.texteditor.controller.EditorController">
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.liamen.texteditor.controller.EditorController" fx:id="mainPane" >
     <top>
         <MenuBar>
             <Menu text="File">
@@ -25,6 +25,6 @@
         <TreeView fx:id="projectTreeView"/>
     </left>
     <center>
-        <TextArea fx:id="textArea"/>
+        <!-- code controlled area -->
     </center>
 </BorderPane>
