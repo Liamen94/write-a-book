@@ -9,6 +9,8 @@ import javafx.scene.control.*;
 import javafx.scene.image.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.web.HTMLEditor;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -19,7 +21,15 @@ public class EditorController {
     private BorderPane mainPane;
 
     @FXML
-    private TextArea textArea;
+    private HTMLEditor htmlEditor;
+
+    @FXML
+    private TabPane mainTabPane;
+    
+    @FXML
+    private VBox textEditorTab;
+
+    @FXML
     private Node infoPane;
 
     @FXML
@@ -28,6 +38,8 @@ public class EditorController {
     private final Image directoryIconEmpty;
     private final Image directoryIconFull;
     private final Image file;
+
+
 
     public EditorController() {
         directoryIconEmpty = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/icons/empty_dir.png")));
@@ -40,7 +52,6 @@ public class EditorController {
     @FXML
     public void initialize() {
 
-        textArea = new TextArea();
 
         try {
             infoPane = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/fxml/infoPane.fxml")));
@@ -60,7 +71,7 @@ public class EditorController {
         // Initialize root
         FileTreeItem rootItem = new FileTreeItem("Project", true);
         rootItem.setExpanded(true);
-
+        mainPane.setCenter(null);
         // Add some basic child
         FileTreeItem item1 = new FileTreeItem("File1.txt", false);
         FileTreeItem item2 = new FileTreeItem("File2.txt", false);
@@ -99,10 +110,12 @@ public class EditorController {
                 if (selectedItem.isDirectory()) {
                     mainPane.setCenter(infoPane);
                 } else {
-                    mainPane.setCenter(textArea);
+                    mainPane.setCenter(textEditorTab);
                 }
             }
         });
+
+
     }
 
     private void setIcon(FileTreeItem item) {

@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.web.HTMLEditor?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.liamen.texteditor.controller.EditorController" fx:id="mainPane" >
     <top>
@@ -25,6 +26,13 @@
         <TreeView fx:id="projectTreeView"/>
     </left>
     <center>
-        <!-- code controlled area -->
+        <TabPane fx:id="mainTabPane">
+            <Tab text="Text Editor" closable="false">
+                <VBox fx:id="textEditorTab">
+                    <HTMLEditor fx:id="htmlEditor" prefHeight="600" prefWidth="800"/>
+                </VBox>
+            </Tab>
+            <!-- code controlled area -->
+        </TabPane>
     </center>
 </BorderPane>
