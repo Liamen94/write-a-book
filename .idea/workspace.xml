@@ -5,26 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cebe2b76-7ee6-4b9f-a98d-7cd6bbe79775" name="Changes" comment="Added a more advanced text area">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/liamen/module-info.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/WriteABook-1.0-SNAPSHOT.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/images/icons/favicon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/module-info.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/maven-archiver/pom.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/fxml/rootPane.fxml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/images/icons/root.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/liamen/texteditor/controller/EditorController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/liamen/texteditor/controller/EditorController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/liamen/texteditor/model/FileTreeItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/liamen/texteditor/model/FileTreeItem.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/liamen/texteditor/view/StyledTreeCell.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/liamen/texteditor/view/StyledTreeCell.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/fxml/editor.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/fxml/editor.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/liamen/texteditor/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/liamen/texteditor/Main.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/liamen/texteditor/controller/EditorController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/liamen/texteditor/controller/EditorController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/liamen/texteditor/controller/ProjectController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/liamen/texteditor/controller/ProjectController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/liamen/texteditor/model/FileItem.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/liamen/texteditor/model/FileItem.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/liamen/texteditor/model/FileTreeItem.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/liamen/texteditor/model/FileTreeItem.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/liamen/texteditor/model/Project.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/liamen/texteditor/model/Project.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/liamen/texteditor/view/StyledTreeCell.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/liamen/texteditor/view/StyledTreeCell.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/fxml/editor.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/fxml/editor.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,8 +29,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="FxmlFile" />
         <option value="Class" />
+        <option value="FxmlFile" />
       </list>
     </option>
   </component>
@@ -108,8 +103,8 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\ProgrammingProjects\Java\WriteABook\src\main\java\com\liamen" />
       <recent name="D:\ProgrammingProjects\Java\WriteABook\src\main\resources\images\icons" />
+      <recent name="D:\ProgrammingProjects\Java\WriteABook\src\main\java\com\liamen" />
       <recent name="D:\ProgrammingProjects\Java\WriteABook\src\main\resources\images" />
       <recent name="D:\ProgrammingProjects\Java\WriteABook\src\main\java\com\liamen\texteditor" />
       <recent name="D:\ProgrammingProjects\Java\WriteABook" />
@@ -184,7 +179,23 @@
       <option name="project" value="LOCAL" />
       <updated>1739126490985</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Added a more advanced text area">
+      <option name="closed" value="true" />
+      <created>1739213353416</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1739213353416</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Added a more advanced text area">
+      <option name="closed" value="true" />
+      <created>1739213410911</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1739213410911</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

@@ -1,8 +1,0 @@
-com\liamen\texteditor\Main.class
-com\liamen\texteditor\model\FileItem.class
-com\liamen\texteditor\view\StyledTreeCell.class
-com\liamen\texteditor\model\FileTreeItem.class
-com\liamen\texteditor\controller\ProjectController.class
-module-info.class
-com\liamen\texteditor\controller\EditorController.class
-com\liamen\texteditor\model\Project.class

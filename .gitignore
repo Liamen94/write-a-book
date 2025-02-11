@@ -2,3 +2,4 @@
 out/
 !src/main/main/**/out/
 !src/main/test/**/out/
+/target/

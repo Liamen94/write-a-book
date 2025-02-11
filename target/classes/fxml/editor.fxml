@@ -9,11 +9,12 @@
         <MenuBar>
             <Menu text="File">
                 <Menu text="New">
+                    <MenuItem text="Project" onAction="#newProject"/>
                     <MenuItem text="File" onAction="#createNewFile"/>
                     <MenuItem text="Directory" onAction="#createNewDirectory"/>
                 </Menu>
-                <MenuItem text="Open"/>
-                <MenuItem text="Save"/>
+                <MenuItem text="Open" onAction="#openProject"/>
+                <MenuItem text="Save" onAction="#saveProject"/>
                 <MenuItem text="Exit"/>
             </Menu>
             <Menu text="Edit">
@@ -27,12 +28,6 @@
     </left>
     <center>
         <TabPane fx:id="mainTabPane">
-            <Tab text="Text Editor" closable="false">
-                <VBox fx:id="textEditorTab">
-                    <HTMLEditor fx:id="htmlEditor" prefHeight="600" prefWidth="800"/>
-                </VBox>
-            </Tab>
-            <!-- code controlled area -->
         </TabPane>
     </center>
 </BorderPane>

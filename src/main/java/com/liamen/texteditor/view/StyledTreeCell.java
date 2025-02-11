@@ -8,12 +8,14 @@ import javafx.scene.image.ImageView;
 public class StyledTreeCell extends TreeCell<String> {
     private final Image directoryIconEmpty;
     private final Image directoryIconFull;
-    private final Image file;
+    private final Image fileIcon;
+    private final Image rootIcon;
 
-    public StyledTreeCell(Image directoryIconEmpty, Image directoryIconFull, Image file) {
+    public StyledTreeCell(Image directoryIconEmpty, Image directoryIconFull, Image fileIcon, Image rootIcon) {
         this.directoryIconEmpty = directoryIconEmpty;
         this.directoryIconFull = directoryIconFull;
-        this.file = file;
+        this.fileIcon = fileIcon;
+        this.rootIcon = rootIcon;
     }
 
     @Override
@@ -29,7 +31,10 @@ public class StyledTreeCell extends TreeCell<String> {
                 FileTreeItem fileTreeItem = (FileTreeItem) getTreeItem();
                 ImageView imageView;
                 if(fileTreeItem.isDirectory()){
-                    if(fileTreeItem.getChildren().isEmpty()){
+                    if(fileTreeItem.isRoot()){
+                        getStyleClass().add("root-cell");
+                        imageView = new ImageView(rootIcon);
+                    } else if(fileTreeItem.getChildren().isEmpty()){
                         getStyleClass().remove("directory-cell");
                         imageView =new ImageView(directoryIconEmpty);
                         getStyleClass().add("empty-directory-cell");
@@ -38,9 +43,8 @@ public class StyledTreeCell extends TreeCell<String> {
                         imageView = new ImageView(directoryIconFull);
                         getStyleClass().remove("empty-directory-cell");
                     }
-
                 } else {
-                    imageView = new ImageView(file);
+                    imageView = new ImageView(fileIcon);
                 }
                 imageView.setFitWidth(16);
                 imageView.setFitHeight(16);

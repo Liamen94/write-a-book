@@ -2,6 +2,11 @@ package com.liamen.texteditor.controller;
 
 import com.liamen.texteditor.model.FileTreeItem;
 import com.liamen.texteditor.view.StyledTreeCell;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -11,10 +16,10 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.HTMLEditor;
+import javafx.stage.FileChooser;
 
-import java.io.IOException;
-import java.util.Objects;
-import java.util.Optional;
+import java.io.*;
+import java.util.*;
 
 public class EditorController {
     @FXML
@@ -25,30 +30,36 @@ public class EditorController {
 
     @FXML
     private TabPane mainTabPane;
-    
+
     @FXML
     private VBox textEditorTab;
 
     @FXML
     private Node infoPane;
+    private Node rootPane;
 
     @FXML
     private TreeView<String> projectTreeView;
 
+    private Map<String, HTMLEditor> editorsMap = new HashMap<>();
+
     private final Image directoryIconEmpty;
     private final Image directoryIconFull;
-    private final Image file;
+    private final Image fileIcon;
+    private final Image rootIcon;
 
 
 
     public EditorController() {
         directoryIconEmpty = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/icons/empty_dir.png")));
         directoryIconFull = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/icons/dir.png")));
-        file = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/icons/file.png")));
+        fileIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/icons/file.png")));
+        rootIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/icons/root.png")));
     }
 
 
 
+    @SuppressWarnings("unused")
     @FXML
     public void initialize() {
 
@@ -56,36 +67,25 @@ public class EditorController {
         try {
             infoPane = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/fxml/infoPane.fxml")));
         } catch (IOException e) {
-            //noinspection CallToPrintStackTrace
             e.printStackTrace();
             System.out.println("Error loading infoPane.fxml");
         }
-        if(directoryIconEmpty.isError()){
-            System.out.println("Error loading empty_dir.png");
+
+        try {
+            rootPane = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/fxml/rootPane.fxml")));
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Error loading rootPane.fxml");
         }
-        if(directoryIconFull.isError()){
-            System.out.println(("Error loading dir.png"));
-        }
+
         //load stylesheet
         mainPane.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/css/style.css")).toExternalForm());
-        // Initialize root
-        FileTreeItem rootItem = new FileTreeItem("Project", true);
-        rootItem.setExpanded(true);
+
         mainPane.setCenter(null);
-        // Add some basic child
-        FileTreeItem item1 = new FileTreeItem("File1.txt", false);
-        FileTreeItem item2 = new FileTreeItem("File2.txt", false);
-        FileTreeItem dir1 = new FileTreeItem("Directory1", true);
-        setIcon(dir1);
 
-        rootItem.getChildren().addAll(item1, item2, dir1);
 
-        // Set the root on the view
-        projectTreeView.setRoot(rootItem);
-        projectTreeView.setShowRoot(true);
-
-        projectTreeView.setCellFactory(treeView -> {
-            TreeCell<String> cell = new StyledTreeCell(directoryIconEmpty, directoryIconFull, file);
+        projectTreeView.setCellFactory(_treeView -> {
+            TreeCell<String> cell = new StyledTreeCell(directoryIconEmpty, directoryIconFull, fileIcon, rootIcon);
             ContextMenu contextMenu = new ContextMenu();
             Menu newMenu = new Menu("New");
             MenuItem newFileItem = new MenuItem("New File");
@@ -108,14 +108,62 @@ public class EditorController {
             if (newValue != null) {
                 FileTreeItem selectedItem = (FileTreeItem) newValue;
                 if (selectedItem.isDirectory()) {
-                    mainPane.setCenter(infoPane);
+                    if(selectedItem.isRoot()){
+                        mainPane.setCenter(rootPane);
+                    } else {
+                        mainPane.setCenter(infoPane);
+                    }
                 } else {
-                    mainPane.setCenter(textEditorTab);
+                    mainPane.setCenter(mainTabPane);
+                    showFileContent(selectedItem);
                 }
             }
         });
 
+        mainTabPane.getTabs().addListener((ListChangeListener<Tab>) c -> {
+        while (c.next()) {
+            if (c.wasRemoved()) {
+                for (Tab tab : c.getRemoved()) {
+                    HTMLEditor editor = (HTMLEditor) tab.getContent();
+                    String filePath = getFilePathByEditor(editor);
+                    if (filePath != null) {
+                        editorsMap.put(filePath, editor);
+                    }
+                }
+            }
+        }
+    });
+}
 
+
+    
+
+    private void showFileContent(FileTreeItem fileItem) {
+        String filePath = fileItem.getFullPath();
+        HTMLEditor editor;
+        Tab tab;
+
+        if (editorsMap.containsKey(filePath)) {
+            editor = editorsMap.get(filePath);
+            tab = findTabByEditor(editor);
+        } else {
+            editor = new HTMLEditor();
+            editorsMap.put(filePath, editor);
+            tab = new Tab(fileItem.getValue(), editor);
+            tab.setOnClosed(_ -> editorsMap.remove(filePath)); // Rimuove l'editor dalla mappa quando la scheda viene chiusa
+            mainTabPane.getTabs().add(tab);
+        }
+
+        mainTabPane.getSelectionModel().select(tab);
+    }
+
+    private Tab findTabByEditor(HTMLEditor editor) {
+        for (Tab tab : mainTabPane.getTabs()) {
+            if (tab.getContent() == editor) {
+                return tab;
+            }
+        }
+        return null;
     }
 
     private void setIcon(FileTreeItem item) {
@@ -126,7 +174,7 @@ public class EditorController {
                 item.setGraphic(new ImageView(directoryIconFull));
             }
         } else {
-            item.setGraphic(new ImageView((file)));
+            item.setGraphic(new ImageView((fileIcon)));
         }
     }
 
@@ -178,5 +226,106 @@ public class EditorController {
         createNewItem(true);
     }
 
+    @FXML
+    private void newProject() {
+        FileTreeItem root = new FileTreeItem("New Project",true);
+        root.setRoot(true);
+        projectTreeView.setRoot(root);
+        mainPane.setCenter(rootPane);
+        mainTabPane.getTabs().clear();
+        editorsMap.clear();
+    }
 
+    @FXML
+    private void openProject() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open Project File");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Write A Book Project Files (.wabop)", "*.wabop"));
+        File selectedFile = fileChooser.showOpenDialog(mainPane.getScene().getWindow());
+
+        if (selectedFile != null) {
+            try (FileReader reader = new FileReader(selectedFile)) {
+                ObjectMapper mapper = new ObjectMapper();
+                ObjectNode rootNode = (ObjectNode) mapper.readTree(reader);
+
+                FileTreeItem rootItem = new FileTreeItem(rootNode.fieldNames().next(), true);
+                rootItem.setRoot(true);
+                loadTree((ObjectNode) rootNode.get(rootItem.getValue()), rootItem);
+                projectTreeView.setRoot(rootItem);
+                editorsMap.clear();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @FXML
+    private void saveProject() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save Project File");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Write A Book Project Files (.wabop)", "*.wabop"));
+        File selectedFile = fileChooser.showSaveDialog(mainPane.getScene().getWindow());
+
+        if (selectedFile != null) {
+            try (FileWriter writer = new FileWriter(selectedFile)) {
+                ObjectMapper mapper = new ObjectMapper();
+                ObjectNode rootNode = mapper.createObjectNode();
+                FileTreeItem rootItem = (FileTreeItem) projectTreeView.getRoot();
+                ObjectNode rootContent = rootNode.putObject(rootItem.getValue());
+                rootContent.put("isDirectory", rootItem.isDirectory());
+                saveTree(rootContent, rootItem);
+                mapper.writerWithDefaultPrettyPrinter().writeValue(writer, rootNode);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void loadTree(ObjectNode jsonNode, FileTreeItem parentItem) {
+        Iterator<String> fieldNames = jsonNode.fieldNames();
+        while (fieldNames.hasNext()) {
+            String fieldName = fieldNames.next();
+            JsonNode childNode = jsonNode.get(fieldName);
+            
+            if (childNode.isObject()) {
+                ObjectNode childObjectNode = (ObjectNode) childNode;
+                boolean isDirectory = childObjectNode.get("isDirectory").asBoolean();
+                FileTreeItem newItem = new FileTreeItem(fieldName, isDirectory);
+                parentItem.getChildren().add(newItem);
+            
+                 if (isDirectory) {
+                    loadTree(childObjectNode, newItem);
+                } else {
+                    HTMLEditor editor = new HTMLEditor();
+                    editor.setHtmlText(childObjectNode.get("content").asText());
+                    editorsMap.put(newItem.getFullPath(), editor);
+                }
+        }
+    }
 }
+
+    private void saveTree(ObjectNode jsonNode, FileTreeItem parentItem) {
+        for (TreeItem<String> child : parentItem.getChildren()) {
+            FileTreeItem fileTreeItem = (FileTreeItem) child;
+            ObjectNode childNode = jsonNode.putObject(fileTreeItem.getValue());
+            childNode.put("isDirectory", fileTreeItem.isDirectory());
+            if (fileTreeItem.isDirectory()) {
+                saveTree(childNode, fileTreeItem);
+            } else {
+                HTMLEditor editor = editorsMap.get(fileTreeItem.getFullPath());
+                childNode.put("content", editor != null ? editor.getHtmlText() : "");
+            }
+        }
+    }
+
+    private String getFilePathByEditor(HTMLEditor editor) {
+        for (Map.Entry<String, HTMLEditor> entry : editorsMap.entrySet()) {
+            if (entry.getValue().equals(editor)) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+}
+
+

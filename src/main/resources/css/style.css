@@ -2,16 +2,9 @@
     -fx-font-weight: bold;
 }
 
-.directory-cell > .label {
-    -fx-graphic: url("@/images/icons/dir.png")
-}
-
 .empty-directory-cell {
     -fx-text-fill: #777777;
     -fx-font-style: italic;
 }
 
-.empty-directory-cell > .label {
-    -fx-graphic: url("@/images/icons/empty_dir.png")
-}
 
