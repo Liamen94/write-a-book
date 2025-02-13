@@ -92,11 +92,18 @@ public class EditorController {
             newFileItem.setOnAction(event-> createNewFile());
             MenuItem newDirItem = new MenuItem("New Directory");
             newDirItem.setOnAction(event-> createNewDirectory());
+            MenuItem renameItem = new MenuItem("Rename");
+            renameItem.setOnAction(event->{
+                FileTreeItem selectedItem = (FileTreeItem) cell.getTreeItem();
+                renameItem(selectedItem);
+            });
             newMenu.getItems().addAll(newFileItem, newDirItem);
-            contextMenu.getItems().add(newMenu);
+            contextMenu.getItems().addAll(newMenu, renameItem);
 
             cell.setOnMouseClicked(event ->{
                 if(event.getButton() == MouseButton.SECONDARY ){
+                    FileTreeItem selectedItem = (FileTreeItem) cell.getTreeItem();
+                    renameItem.setDisable(selectedItem == null);
                     cell.setContextMenu(contextMenu);
                 }
             });
@@ -214,6 +221,45 @@ public class EditorController {
                 }
             }
         });
+    }
+
+    private void renameItem(FileTreeItem item){
+        String itemType = item.isDirectory() ? "Directory" : "File";
+        String itemName = item.getValue();
+        TextInputDialog dialog = new TextInputDialog(itemName);
+        dialog.setTitle("Rename " + itemName);
+        dialog.setHeaderText("Enter the new name of " + itemType.toLowerCase() + ":");
+        dialog.setContentText(itemType + " name:");
+        Optional<String> result = dialog.showAndWait();
+            result.ifPresent(itemNewName -> {
+                FileTreeItem selectedItem = (FileTreeItem) projectTreeView.getSelectionModel().getSelectedItem();
+                if (selectedItem != null) {
+                    TreeItem<String> parent = selectedItem.isDirectory() ? selectedItem : selectedItem.getParent();
+                    if (parent != null) {
+                        boolean exists = parent.getChildren().stream()
+                                .filter(child -> child instanceof FileTreeItem)
+                                .map(child -> (FileTreeItem) child)
+                                .anyMatch(child -> child.getValue().equals(itemNewName) && child.isDirectory() == item.isDirectory());
+
+                        if (exists) {
+                            Alert alert = new Alert(Alert.AlertType.ERROR, "An item with the same name already exists in this level.");
+                            alert.show();
+                        } else{
+                            item.setValue(itemNewName);
+                            // Aggiorna la mappa degli editor
+                            String oldFullPath = item.getFullPath().replace(itemNewName, itemName);  // Calcola il vecchio percorso completo
+                            HTMLEditor editor = editorsMap.remove(oldFullPath);
+                            editorsMap.put(item.getFullPath(), editor);
+
+                            // Aggiorna la scheda corrispondente
+                            Tab tab = findTabByEditor(editor);
+                            if (tab != null) {
+                                tab.setText(itemNewName);
+                            }
+                        }
+                    }
+                }
+            });
     }
 
     @FXML
