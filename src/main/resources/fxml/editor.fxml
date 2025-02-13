@@ -10,11 +10,11 @@
             <Menu text="File">
                 <Menu text="New">
                     <MenuItem text="Project" onAction="#newProject"/>
-                    <MenuItem text="File" onAction="#createNewFile"/>
-                    <MenuItem text="Directory" onAction="#createNewDirectory"/>
+                    <MenuItem fx:id="newFileMenu" text="File" onAction="#createNewFile"/>
+                    <MenuItem fx:id="newDirMenu" text="Directory" onAction="#createNewDirectory"/>
                 </Menu>
                 <MenuItem text="Open" onAction="#openProject"/>
-                <MenuItem text="Save" onAction="#saveProject"/>
+                <MenuItem fx:id="saveMenu" text="Save" onAction="#saveProject"/>
                 <MenuItem text="Exit"/>
             </Menu>
             <Menu text="Edit">

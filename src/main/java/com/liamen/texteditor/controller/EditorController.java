@@ -1,38 +1,28 @@
 package com.liamen.texteditor.controller;
 
 import com.liamen.texteditor.model.FileTreeItem;
+import com.liamen.texteditor.service.*;
 import com.liamen.texteditor.view.StyledTreeCell;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.image.*;
+import javafx.scene.Node;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.web.HTMLEditor;
 import javafx.stage.FileChooser;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.Objects;
 
 public class EditorController {
     @FXML
     private BorderPane mainPane;
 
     @FXML
-    private HTMLEditor htmlEditor;
-
-    @FXML
     private TabPane mainTabPane;
-
-    @FXML
-    private VBox textEditorTab;
 
     @FXML
     private Node infoPane;
@@ -40,15 +30,22 @@ public class EditorController {
 
     @FXML
     private TreeView<String> projectTreeView;
+    
+    @FXML
+    private MenuItem newFileMenu;
+    @FXML
+    private MenuItem newDirMenu;
+    @FXML
+    private MenuItem saveMenu;
 
-    private Map<String, HTMLEditor> editorsMap = new HashMap<>();
+    private final FileService fileService = new FileService();
+    private final TreeViewService treeViewService = new TreeViewService();
+    private final TabService tabService = new TabService();
 
     private final Image directoryIconEmpty;
     private final Image directoryIconFull;
     private final Image fileIcon;
     private final Image rootIcon;
-
-
 
     public EditorController() {
         directoryIconEmpty = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/icons/empty_dir.png")));
@@ -57,12 +54,8 @@ public class EditorController {
         rootIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/icons/root.png")));
     }
 
-
-
-    @SuppressWarnings("unused")
     @FXML
     public void initialize() {
-
 
         try {
             infoPane = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/fxml/infoPane.fxml")));
@@ -78,31 +71,33 @@ public class EditorController {
             System.out.println("Error loading rootPane.fxml");
         }
 
-        //load stylesheet
-        mainPane.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/css/style.css")).toExternalForm());
+        disableMenus();
 
-        mainPane.setCenter(null);
-
-
-        projectTreeView.setCellFactory(_treeView -> {
+        projectTreeView.setCellFactory(_ -> {
             TreeCell<String> cell = new StyledTreeCell(directoryIconEmpty, directoryIconFull, fileIcon, rootIcon);
             ContextMenu contextMenu = new ContextMenu();
             Menu newMenu = new Menu("New");
             MenuItem newFileItem = new MenuItem("New File");
-            newFileItem.setOnAction(event-> createNewFile());
+            newFileItem.setOnAction(_ -> {
+                createNewFile();
+            });
             MenuItem newDirItem = new MenuItem("New Directory");
-            newDirItem.setOnAction(event-> createNewDirectory());
+            newDirItem.setOnAction(_ -> {
+                createNewDirectory();
+            });
             MenuItem renameItem = new MenuItem("Rename");
-            renameItem.setOnAction(event->{
+            renameItem.setOnAction(_ -> {
                 FileTreeItem selectedItem = (FileTreeItem) cell.getTreeItem();
                 renameItem(selectedItem);
             });
             newMenu.getItems().addAll(newFileItem, newDirItem);
             contextMenu.getItems().addAll(newMenu, renameItem);
 
-            cell.setOnMouseClicked(event ->{
-                if(event.getButton() == MouseButton.SECONDARY ){
+            cell.setOnMouseClicked(event -> {
+                if (event.getButton() == MouseButton.SECONDARY) {
                     FileTreeItem selectedItem = (FileTreeItem) cell.getTreeItem();
+                    newFileItem.setDisable(projectTreeView.getRoot() == null);
+                    newDirItem.setDisable(projectTreeView.getRoot() == null);
                     renameItem.setDisable(selectedItem == null);
                     cell.setContextMenu(contextMenu);
                 }
@@ -110,176 +105,97 @@ public class EditorController {
             return cell;
         });
 
-        // Add listener to the tree view in order to disable item text area
-        projectTreeView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+
+        projectTreeView.getSelectionModel().selectedItemProperty().addListener((_, _, newValue) -> {
             if (newValue != null) {
                 FileTreeItem selectedItem = (FileTreeItem) newValue;
                 if (selectedItem.isDirectory()) {
-                    if(selectedItem.isRoot()){
-                        mainPane.setCenter(rootPane);
-                    } else {
-                        mainPane.setCenter(infoPane);
-                    }
+                    mainPane.setCenter(selectedItem.isRoot() ? rootPane : infoPane);
                 } else {
                     mainPane.setCenter(mainTabPane);
                     showFileContent(selectedItem);
                 }
             }
         });
-
-        mainTabPane.getTabs().addListener((ListChangeListener<Tab>) c -> {
-        while (c.next()) {
-            if (c.wasRemoved()) {
-                for (Tab tab : c.getRemoved()) {
-                    HTMLEditor editor = (HTMLEditor) tab.getContent();
-                    String filePath = getFilePathByEditor(editor);
-                    if (filePath != null) {
-                        editorsMap.put(filePath, editor);
-                    }
-                }
-            }
-        }
-    });
-}
-
-
-    
+    }
 
     private void showFileContent(FileTreeItem fileItem) {
-        String filePath = fileItem.getFullPath();
+        String fullPath = fileItem.getFullPath();
         HTMLEditor editor;
         Tab tab;
 
-        if (editorsMap.containsKey(filePath)) {
-            editor = editorsMap.get(filePath);
-            tab = findTabByEditor(editor);
+        if (fileService.getEditor(fullPath) != null) {
+            editor = fileService.getEditor(fullPath);
+            tab = tabService.findTabByEditor(mainTabPane, editor);
+            if (tab == null) {
+                tab = new Tab(fileItem.getValue(), editor);
+                tab.setOnClosed(_ -> fileService.removeEditor(fullPath));
+                mainTabPane.getTabs().add(tab);
+            }
         } else {
             editor = new HTMLEditor();
-            editorsMap.put(filePath, editor);
+            fileService.addEditor(fullPath, editor);
             tab = new Tab(fileItem.getValue(), editor);
-            tab.setOnClosed(_ -> editorsMap.remove(filePath)); // Rimuove l'editor dalla mappa quando la scheda viene chiusa
+            tab.setOnClosed(_ -> fileService.removeEditor(fullPath));
             mainTabPane.getTabs().add(tab);
         }
 
         mainTabPane.getSelectionModel().select(tab);
     }
 
-    private Tab findTabByEditor(HTMLEditor editor) {
-        for (Tab tab : mainTabPane.getTabs()) {
-            if (tab.getContent() == editor) {
-                return tab;
-            }
-        }
-        return null;
-    }
-
-    private void setIcon(FileTreeItem item) {
-        if(item.isDirectory()){
-            if (item.getChildren().isEmpty()) {
-                item.setGraphic(new ImageView(directoryIconEmpty));
-            } else {
-                item.setGraphic(new ImageView(directoryIconFull));
-            }
-        } else {
-            item.setGraphic(new ImageView((fileIcon)));
-        }
-    }
-
-    // Methods to add child in the tree view
-    private void createNewItem(boolean isDirectory) {
-        String itemType = isDirectory ? "Directory" : "File";
-        TextInputDialog dialog = new TextInputDialog(isDirectory ? "NewDirectory" : "NewFile.txt");
-        dialog.setTitle("Create New " + itemType);
-        dialog.setHeaderText("Enter the name of the new " + itemType.toLowerCase() + ":");
-        dialog.setContentText(itemType + " name:");
-
-        Optional<String> result = dialog.showAndWait();
-        result.ifPresent(itemName -> {
-            FileTreeItem selectedItem = (FileTreeItem) projectTreeView.getSelectionModel().getSelectedItem();
-            if (selectedItem != null) {
-                TreeItem<String> parent = selectedItem.isDirectory() ? selectedItem : selectedItem.getParent();
-                if (parent != null) {
-                    boolean exists = parent.getChildren().stream()
-                            .filter(child -> child instanceof FileTreeItem)
-                            .map(child -> (FileTreeItem) child)
-                            .anyMatch(child -> child.getValue().equals(itemName) && child.isDirectory() == isDirectory);
-
-                    if (exists) {
-                        Alert alert = new Alert(Alert.AlertType.ERROR, "An item with the same name already exists in this level.");
-                        alert.show();
-                    } else {
-                        FileTreeItem newItem = new FileTreeItem(itemName, isDirectory);
-                        if (isDirectory) {
-                            setIcon(newItem);
-                        }
-                        parent.getChildren().add(newItem);
-                        parent.setExpanded(true);
-                        if (parent instanceof FileTreeItem){
-                            setIcon((FileTreeItem) parent);
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    private void renameItem(FileTreeItem item){
-        String itemType = item.isDirectory() ? "Directory" : "File";
-        String itemName = item.getValue();
-        TextInputDialog dialog = new TextInputDialog(itemName);
-        dialog.setTitle("Rename " + itemName);
-        dialog.setHeaderText("Enter the new name of " + itemType.toLowerCase() + ":");
-        dialog.setContentText(itemType + " name:");
-        Optional<String> result = dialog.showAndWait();
-            result.ifPresent(itemNewName -> {
-                FileTreeItem selectedItem = (FileTreeItem) projectTreeView.getSelectionModel().getSelectedItem();
-                if (selectedItem != null) {
-                    TreeItem<String> parent = selectedItem.isDirectory() ? selectedItem : selectedItem.getParent();
-                    if (parent != null) {
-                        boolean exists = parent.getChildren().stream()
-                                .filter(child -> child instanceof FileTreeItem)
-                                .map(child -> (FileTreeItem) child)
-                                .anyMatch(child -> child.getValue().equals(itemNewName) && child.isDirectory() == item.isDirectory());
-
-                        if (exists) {
-                            Alert alert = new Alert(Alert.AlertType.ERROR, "An item with the same name already exists in this level.");
-                            alert.show();
-                        } else{
-                            item.setValue(itemNewName);
-                            // Aggiorna la mappa degli editor
-                            String oldFullPath = item.getFullPath().replace(itemNewName, itemName);  // Calcola il vecchio percorso completo
-                            HTMLEditor editor = editorsMap.remove(oldFullPath);
-                            editorsMap.put(item.getFullPath(), editor);
-
-                            // Aggiorna la scheda corrispondente
-                            Tab tab = findTabByEditor(editor);
-                            if (tab != null) {
-                                tab.setText(itemNewName);
-                            }
-                        }
-                    }
-                }
-            });
-    }
-
     @FXML
     private void createNewFile() {
-        createNewItem(false);
+        FileTreeItem selectedItem = (FileTreeItem) projectTreeView.getSelectionModel().getSelectedItem();
+        boolean isDirectory = selectedItem.isDirectory();
+        if(isDirectory){
+            treeViewService.createNewItem(selectedItem, false);
+        }
+        else {
+            treeViewService.createNewItem(selectedItem.getParent(), false);
+        }
     }
 
     @FXML
     private void createNewDirectory() {
-        createNewItem(true);
+        FileTreeItem selectedItem = (FileTreeItem) projectTreeView.getSelectionModel().getSelectedItem();
+        boolean isDirectory = selectedItem.isDirectory();
+        if(isDirectory){
+            treeViewService.createNewItem(selectedItem, true);
+        }
+        else {
+            treeViewService.createNewItem(selectedItem.getParent(), true);
+        }
     }
+
+    private void renameItem(FileTreeItem item) {
+        String itemName = item.getValue();
+        treeViewService.renameItem(item);
+        String itemNewName = item.getValue();
+        // Editors map update
+        String oldFullPath = item.getFullPath().replace(itemNewName, itemName);
+        HTMLEditor editor = fileService.getEditor(oldFullPath);
+        fileService.removeEditor(oldFullPath);
+        fileService.addEditor(item.getFullPath(), editor);
+        // Tab update
+        Tab tab = tabService.findTabByEditor(mainTabPane, editor);
+        if (tab != null) {
+                tab.setText(itemNewName);
+            }
+        }
+                
+            
+
 
     @FXML
     private void newProject() {
-        FileTreeItem root = new FileTreeItem("New Project",true);
+        FileTreeItem root = new FileTreeItem("New Project", true);
+        root.setValue(treeViewService.chooseName(root, false, true));
+        root.setExpanded(true);
         root.setRoot(true);
+        enableMenus();
         projectTreeView.setRoot(root);
-        mainPane.setCenter(rootPane);
         mainTabPane.getTabs().clear();
-        editorsMap.clear();
+        fileService.clearEditors();
     }
 
     @FXML
@@ -290,15 +206,13 @@ public class EditorController {
         File selectedFile = fileChooser.showOpenDialog(mainPane.getScene().getWindow());
 
         if (selectedFile != null) {
-            try (FileReader reader = new FileReader(selectedFile)) {
-                ObjectMapper mapper = new ObjectMapper();
-                ObjectNode rootNode = (ObjectNode) mapper.readTree(reader);
-
-                FileTreeItem rootItem = new FileTreeItem(rootNode.fieldNames().next(), true);
+            try {
+                FileTreeItem rootItem = fileService.loadProject(selectedFile);
                 rootItem.setRoot(true);
-                loadTree((ObjectNode) rootNode.get(rootItem.getValue()), rootItem);
                 projectTreeView.setRoot(rootItem);
-                editorsMap.clear();
+                mainTabPane.getTabs().clear();
+                fileService.clearEditors();
+                enableMenus();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -313,65 +227,24 @@ public class EditorController {
         File selectedFile = fileChooser.showSaveDialog(mainPane.getScene().getWindow());
 
         if (selectedFile != null) {
-            try (FileWriter writer = new FileWriter(selectedFile)) {
-                ObjectMapper mapper = new ObjectMapper();
-                ObjectNode rootNode = mapper.createObjectNode();
+            try {
                 FileTreeItem rootItem = (FileTreeItem) projectTreeView.getRoot();
-                ObjectNode rootContent = rootNode.putObject(rootItem.getValue());
-                rootContent.put("isDirectory", rootItem.isDirectory());
-                saveTree(rootContent, rootItem);
-                mapper.writerWithDefaultPrettyPrinter().writeValue(writer, rootNode);
+                fileService.saveProject(selectedFile, rootItem);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private void loadTree(ObjectNode jsonNode, FileTreeItem parentItem) {
-        Iterator<String> fieldNames = jsonNode.fieldNames();
-        while (fieldNames.hasNext()) {
-            String fieldName = fieldNames.next();
-            JsonNode childNode = jsonNode.get(fieldName);
-            
-            if (childNode.isObject()) {
-                ObjectNode childObjectNode = (ObjectNode) childNode;
-                boolean isDirectory = childObjectNode.get("isDirectory").asBoolean();
-                FileTreeItem newItem = new FileTreeItem(fieldName, isDirectory);
-                parentItem.getChildren().add(newItem);
-            
-                 if (isDirectory) {
-                    loadTree(childObjectNode, newItem);
-                } else {
-                    HTMLEditor editor = new HTMLEditor();
-                    editor.setHtmlText(childObjectNode.get("content").asText());
-                    editorsMap.put(newItem.getFullPath(), editor);
-                }
-        }
+    private void disableMenus(){
+        newFileMenu.setDisable(true);
+        newDirMenu.setDisable(true);
+        saveMenu.setDisable(true);
+    }
+
+    private void enableMenus(){
+        newFileMenu.setDisable(false);
+        newDirMenu.setDisable(false);
+        saveMenu.setDisable(false);
     }
 }
-
-    private void saveTree(ObjectNode jsonNode, FileTreeItem parentItem) {
-        for (TreeItem<String> child : parentItem.getChildren()) {
-            FileTreeItem fileTreeItem = (FileTreeItem) child;
-            ObjectNode childNode = jsonNode.putObject(fileTreeItem.getValue());
-            childNode.put("isDirectory", fileTreeItem.isDirectory());
-            if (fileTreeItem.isDirectory()) {
-                saveTree(childNode, fileTreeItem);
-            } else {
-                HTMLEditor editor = editorsMap.get(fileTreeItem.getFullPath());
-                childNode.put("content", editor != null ? editor.getHtmlText() : "");
-            }
-        }
-    }
-
-    private String getFilePathByEditor(HTMLEditor editor) {
-        for (Map.Entry<String, HTMLEditor> entry : editorsMap.entrySet()) {
-            if (entry.getValue().equals(editor)) {
-                return entry.getKey();
-            }
-        }
-        return null;
-    }
-}
-
-
