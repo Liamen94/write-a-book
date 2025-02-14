@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.control.*?>
-
-<VBox>
-    <Label text="Welcome to your new project!"/>
-    <Label text="Create new directory or file!"/>
-</VBox>
