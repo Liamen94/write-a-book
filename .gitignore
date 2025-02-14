@@ -1,0 +1,23 @@
+# Cartelle e file generati dall'IDE
+.idea/
+.settings/
+.vscode/
+*.iml
+
+# File di compilazione e output
+target/
+*.class
+
+# File di configurazione specifici dell'IDE
+.classpath
+.project
+
+# Log, cache e file temporanei
+*.log
+*.tmp
+*.swp
+*.swo
+
+# File di sistema (Windows/macOS/Linux)
+.DS_Store
+Thumbs.db

@@ -1,0 +1,10 @@
+.directory-cell {
+    -fx-font-weight: bold;
+}
+
+.empty-directory-cell {
+    -fx-text-fill: #777777;
+    -fx-font-style: italic;
+}
+
+
