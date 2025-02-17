@@ -1,9 +1,9 @@
-package com.liamen.texteditor.service;
+package com.writeabook.texteditor.service;
 
 import java.util.Optional;
 
-import com.liamen.texteditor.model.FileTreeItem;
-import com.liamen.texteditor.model.FileItem;
+import com.writeabook.texteditor.model.FileTreeItem;
+import com.writeabook.texteditor.model.FileItem;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextInputDialog;

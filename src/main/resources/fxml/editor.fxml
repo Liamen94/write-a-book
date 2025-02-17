@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.web.HTMLEditor?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.liamen.texteditor.controller.EditorController" fx:id="mainPane" >
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.writeabook.texteditor.controller.EditorController" fx:id="mainPane" >
     <top>
         <MenuBar>
             <Menu text="File">

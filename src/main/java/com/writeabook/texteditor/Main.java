@@ -1,4 +1,4 @@
-package com.liamen.texteditor;
+package com.writeabook.texteditor;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

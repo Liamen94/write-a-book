@@ -1,4 +1,4 @@
-package com.liamen.texteditor.model;
+package com.writeabook.texteditor.model;
 
 import java.io.File;
 import java.util.ArrayList;

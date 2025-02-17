@@ -1,6 +1,6 @@
-package com.liamen.texteditor.view;
+package com.writeabook.texteditor.view;
 
-import com.liamen.texteditor.model.FileTreeItem;
+import com.writeabook.texteditor.model.FileTreeItem;
 import javafx.scene.control.TreeCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;

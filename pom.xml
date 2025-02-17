@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.liamen-94</groupId>
+    <groupId>com.writeabook-94</groupId>
     <artifactId>WriteABook</artifactId>
     <version>0.0.1 alpha</version>
 
@@ -64,7 +64,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>com.liamen.texteditor.Main</mainClass>
+                    <mainClass>com.writeabook.texteditor.Main</mainClass>
                 </configuration>
             </plugin>
             <plugin>

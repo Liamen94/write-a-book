@@ -1,4 +1,4 @@
-package com.liamen.texteditor.model;
+package com.writeabook.texteditor.model;
 
 import javafx.scene.web.HTMLEditor;
 
