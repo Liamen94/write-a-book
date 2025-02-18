@@ -11,6 +11,8 @@ import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.web.HTMLEditor;
 import javafx.stage.FileChooser;
 
@@ -30,6 +32,18 @@ public class EditorController {
     private Node rootPane;
 
     @FXML
+    private TextField searchField;
+
+    @FXML
+    private TextField replaceField;
+
+    @FXML
+    private HBox searchBox;
+
+    @FXML
+    private VBox centerBox;
+
+    @FXML
     private TreeView<String> projectTreeView;
     
     @FXML
@@ -38,6 +52,8 @@ public class EditorController {
     private MenuItem newDirMenu;
     @FXML
     private MenuItem saveMenu;
+
+    private String originalContent;
 
     private final FileService fileService = new FileService();
     private final TreeViewService treeViewService = new TreeViewService();
@@ -118,9 +134,13 @@ public class EditorController {
                 FileTreeItem selectedItem = (FileTreeItem) newValue;
                 if (selectedItem.isDirectory()) {
                     mainPane.setCenter(selectedItem.isRoot() ? rootPane : infoPane);
+                    searchBox.setVisible(false);
+                    searchBox.setManaged(false);
                 } else {
-                    mainPane.setCenter(mainTabPane);
+                    mainPane.setCenter(centerBox);
                     showFileContent(selectedItem);
+                    searchBox.setVisible(true);
+                    searchBox.setManaged(true);
                 }
             }
         });
@@ -252,5 +272,69 @@ public class EditorController {
         newFileMenu.setDisable(false);
         newDirMenu.setDisable(false);
         saveMenu.setDisable(false);
+    }
+
+    @FXML
+    private void search() {
+        String searchText = searchField.getText();
+        if (searchText == null || searchText.isEmpty()) {
+            HTMLEditor editor = getSelectedEditor();
+            if (editor == null) {
+                return;
+            }
+            if (originalContent != null) {
+                editor.setHtmlText(originalContent);
+            }
+            return;
+        }
+
+        HTMLEditor editor = getSelectedEditor();
+        if (editor == null) {
+            return;
+        }
+
+        if (originalContent != null) {
+            editor.setHtmlText(originalContent);
+        } else {
+            originalContent = editor.getHtmlText(); 
+        }
+
+        // Rimuove l'evidenziazione esistente solo per la classe specifica
+        String content = editor.getHtmlText().replaceAll("<span class='search-highlight' style='background-color: yellow;'>", "")
+        .replaceAll("</span>", "");
+
+        // Evidenziazione del testo
+        String highlightedContent = content.replaceAll("(?i)(" + searchText + ")", "<span class='search-highlight' style='background-color: yellow;'>$1</span>");
+        editor.setHtmlText(highlightedContent);
+    }
+
+
+    @FXML
+    private void replace() {
+        String searchText = searchField.getText();
+        String replaceText = replaceField.getText();
+        if (searchText == null || searchText.isEmpty()) {
+            return;
+        }
+
+        HTMLEditor editor = getSelectedEditor();
+        if (editor == null) {
+            return;
+        }
+
+        String content = editor.getHtmlText();
+        content = content.replace(searchText, replaceText);
+        editor.setHtmlText(content);
+    }
+
+    private HTMLEditor getSelectedEditor() {
+        Tab selectedTab = mainTabPane.getSelectionModel().getSelectedItem();
+        if (selectedTab != null) {
+            Node content = selectedTab.getContent();
+            if (content instanceof HTMLEditor) {
+                return (HTMLEditor) content;
+            }
+        }
+        return null;
     }
 }

@@ -27,17 +27,7 @@
         <TreeView fx:id="projectTreeView"/>
     </left>
     <center>
-            <VBox fx:id="centerBox">
-                <HBox fx:id="searchBox" visible="false" managed="false">
-                    <Label text="Search:"/>
-                    <TextField fx:id="searchField"/>
-                    <Button text="Find" onAction="#search"/>
-                    <Label text="Replace with:"/>
-                    <TextField fx:id="replaceField"/>
-                    <Button text="Replace" onAction="#replace"/>
-                </HBox>
-                <TabPane fx:id="mainTabPane">
-                </TabPane>
-            </VBox>
+        <TabPane fx:id="mainTabPane">
+        </TabPane>
     </center>
 </BorderPane>
